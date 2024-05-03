@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ScrapMapper">
+
+	<insert id="insert" parameterType="map">
+		insert into scrap (scrapId, userId, postId, scrapDate)
+		values(scrap_seq.NEXTVAL, #{userId},#{postId},SYSDATE)
+	</insert>
+
+	<select id="checkScrap" resultType="ScrapDTO" parameterType="map">
+		select * from scrap where userId =#{userId} and postId=#{postId}
+	</select>
+
+<select id="findAll" resultType="ScrapDTO" parameterType="String">
+    SELECT s.scrapId, s.userId, s.postId, s.scrapDate, p.postTitle, p.postBoard
+    FROM scrap s
+    JOIN postDB p ON s.postId = p.postId
+    WHERE s.userId = #{userId}
+</select>
+
+	<select id="findById" resultType="ScrapDTO" parameterType="Long">
+		select * from scrap where SCRAPID = #{scrapId}
+	</select>
+
+	<select id="findAllByPostId" resultType="ScrapDTO" parameterType="Long">
+		select * from scrap where POSTID = #{postId}
+	</select>
+
+	<delete id="delete" parameterType="Long">
+		delete from scrap where scrapId = #{scrapId}
+	</delete>
+
+</mapper>

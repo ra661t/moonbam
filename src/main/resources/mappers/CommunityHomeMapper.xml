@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CommunityHome">
+
+	<select id="chatRoomTotalCount" resultType="int" parameterType="HashMap">
+		select count(*) from chatroom
+		<where>
+			<if test = "searchCategory == '전체'">
+			 	ROOMTITLE like '%'||#{searchValue}||'%'
+			</if>
+			<if test = "searchCategory == '영화'">
+			 	category = 'movie' and ROOMTITLE like '%'||#{searchValue}||'%'
+			</if>
+			<if test = "searchCategory == '독서'">
+			 	category = 'book' and ROOMTITLE like '%'||#{searchValue}||'%'
+			</if>
+			<if test = "searchCategory == '음악'">
+			 	category = 'music' and ROOMTITLE like '%'||#{searchValue}||'%'
+			</if>
+		</where>
+		order by chatnum desc
+	</select>
+	
+	<select id="chatRoomList" resultType="ChatRoomDTO" parameterType="HashMap">
+		select * from chatroom
+			<choose>
+  			<when test="searchCategory == '전체'">
+  				where ROOMTITLE like '%'||#{searchValue}||'%' or
+  				ROOMText like '%'||#{searchValue}||'%' or
+  				addr1 like '%'||#{searchValue}||'%' or
+  				addr2 like '%'||#{searchValue}||'%'
+  			</when>
+  			<when test="searchCategory == '영화'">
+  				where (ROOMTITLE like '%'||#{searchValue}||'%' or
+  				ROOMText like '%'||#{searchValue}||'%' or
+  				addr1 like '%'||#{searchValue}||'%' or
+  				addr2 like '%'||#{searchValue}||'%') and
+  				category = 'movie'
+  			</when>
+  			<when test="searchCategory == '독서'">
+  				where (ROOMTITLE like '%'||#{searchValue}||'%' or
+  				ROOMText like '%'||#{searchValue}||'%' or
+  				addr1 like '%'||#{searchValue}||'%' or
+  				addr2 like '%'||#{searchValue}||'%') and
+  				category = 'book'
+  			</when>
+  			<when test="searchCategory == '음악'">
+  				where (ROOMTITLE like '%'||#{searchValue}||'%' or
+  				ROOMText like '%'||#{searchValue}||'%' or
+  				addr1 like '%'||#{searchValue}||'%' or
+  				addr2 like '%'||#{searchValue}||'%') and
+  				category = 'music'
+  			</when>
+  		</choose>
+		order by chatnum desc
+	</select>
+  	
+  	<select id="myChatRoomList" resultType="String" parameterType="String">
+  		select chatnum from chatmember where userid = #{userid} order by chatnum desc
+  	</select>
+  	
+  	<select id="myChatList" resultType="ChatRoomDTO" parameterType="HashMap">
+  		select * from chatroom join chatmember using(chatnum) where chatnum in ${myChatRoomList}
+  		<choose>
+  			<when test="searchCategory == '전체'">
+  				and ROOMTITLE like '%'||#{searchValue}||'%'
+  			</when>
+  			<when test="searchCategory == '영화'">
+  				and category = 'movie' and ROOMTITLE like '%'||#{searchValue}||'%'
+  			</when>
+  			<when test="searchCategory == '독서'">
+  				and category = 'book' and ROOMTITLE like '%'||#{searchValue}||'%'
+  			</when>
+  			<when test="searchCategory == '음악'">
+  				and category = 'music' and ROOMTITLE like '%'||#{searchValue}||'%'
+  			</when>
+  		</choose>
+  		and iskicked = 'f' and userid= #{userid}
+	</select>
+	
+	
+	<!-- map list select sql -->
+	<select id="getAllChatRooms" resultType="ChatRoomDTO">
+        SELECT chatNum, roomTitle, roomText, addr2
+        FROM chatroom
+    </select>
+
+</mapper>

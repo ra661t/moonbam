@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ChatMapper">
+ 	
+ 	<!-- 모임방 chatRoom 개설 -->
+     <insert id="saveChatRoom" parameterType="ChatRoomDTO">
+         insert into ChatRoom values (
+         chatNum_seq.NEXTVAL, #{roomTitle}, #{roomText},
+         #{currentNow}, #{amount}, #{post}, #{addr1}, #{addr2},
+         #{cDate}, #{mDate}, #{category}, #{leaderId})
+    </insert>
+    
+    <!-- leaderId와 roomtitle로 chatRoom select -->
+    <select id="chatRoomNow" parameterType="hashmap" resultType="chatRoomDTO">
+    	select * from chatRoom
+    	where leaderId = #{userId} and roomTitle = #{roomTitle}
+    </select>
+
+	
+	<!-- 채팅방 삭제 -->
+	<delete id = "deleteChatRoom" >
+		delete from ChatRoom where chatNum = #{chatNum}
+	</delete>
+	
+	<!-- 방장 권한 위임 -->
+	<update id = "delegateMaster" parameterType = "map">
+		update chatRoom set leaderid = #{userId} where chatNum = #{chatNum}
+	</update>
+	
+	<!-- 방장 일치 여부 확인용 select -->
+	<select id = "checkMaster" resultType="String">
+		select leaderid from chatRoom where chatNum=#{chatNum}
+	</select>
+
+	<!-- 채팅방 강퇴 -->
+	<!-- delete가 아니라 update로 isKicked t로 변경 -->
+	<update id = "ChatKickUser" parameterType = "String">
+		update chatmember set isKicked = 't' where userid = #{user}
+	</update>
+	
+	<update id = "updateCurrentNow">
+		update chatroom set currentnow = #{currentNow} where chatNum = #{chatNum}
+	</update>
+
+	<update id = "updateCurrentNow2">
+	UPDATE chatroom
+	SET currentnow =
+	CASE
+	WHEN currentnow > 1 THEN currentnow - 1
+	ELSE currentnow
+	END
+	where chatNum = #{chatNum}
+	</update>
+	
+	
+	<!-- 방 자동 삭제 관련 sql 1개 추가 -miji-->
+	<!-- 현재 방목록 가져오기  -->
+	<select id="chatRoomSelectAll" resultType="ChatRoomDTO">
+		select * from chatRoom
+	</select>
+
+
+</mapper>

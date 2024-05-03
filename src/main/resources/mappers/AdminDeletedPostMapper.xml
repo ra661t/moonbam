@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AdminDeletedPostMapper">
+
+
+	<select id="getList" resultType="AdminDeletedPostDTO">
+		<!-- <select id="getList" resultType="AdminPostDTO" parameterType="HashMap"> --> 
+		select * from admindeletedpost
+	</select>
+
+	<!-- 운영자 삭제 -->
+	<insert id="insertDeletedPostsfromReport" parameterType = "AdminDeletedPostDTO">
+		insert into admindeletedpost values(
+			SYSDATE, #{postid}, #{postboard},
+			#{userid}, #{contid}, #{posttitle},
+			#{postdate}, #{posteditdate}, #{posttext},
+			#{categoryid}, #{cause}, SYSDATE+30
+		)
+	</insert>
+	
+	<!-- 자진삭제 -->
+	<insert id="insertDeletedPostsfromPost" parameterType = "AdminDeletedPostDTO">
+		insert into admindeletedpost values(
+		XbXB
+		)
+	</insert>
+	
+	<delete id="cleanDeletedPost" parameterType = "String">
+		delete from admindeletedpost
+		<if test="postid != null">
+		    where postid = #{postid}
+	    </if>
+	</delete>
+	
+	<select id = "getDeletedPost" parameterType = "String" resultType = "AdminDeletedPostDTO">
+	SELECT adp.*, mdb.nickname AS nickname
+	FROM admindeletedpost adp
+	JOIN memberDB mdb ON adp.userid = mdb.userid
+	WHERE postId = #{postId}
+	</select>
+
+</mapper>
